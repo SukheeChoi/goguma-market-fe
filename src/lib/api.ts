@@ -1,13 +1,13 @@
 import axios from 'axios'
 
 // Axios 인스턴스 생성
-export const apiClient = axios.create({
+export const api = axios.create({
   baseURL: process.env.NODE_ENV === 'development' ? 'http://localhost:8082/api' : '/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
-})
+});
 
 // 토큰 저장소
 let authToken: string | null = null
@@ -15,10 +15,10 @@ let authToken: string | null = null
 export const setAuthToken = (token: string | null) => {
   authToken = token
   if (token) {
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
     localStorage.setItem('authToken', token)
   } else {
-    delete apiClient.defaults.headers.common['Authorization']
+    delete api.defaults.headers.common['Authorization']
     localStorage.removeItem('authToken')
   }
 }
@@ -34,7 +34,7 @@ export const initializeAuth = () => {
 }
 
 // 요청 인터셉터
-apiClient.interceptors.request.use(
+api.interceptors.request.use(
   (config) => {
     // 토큰이 있으면 헤더에 추가
     if (authToken) {
@@ -48,7 +48,7 @@ apiClient.interceptors.request.use(
 )
 
 // 응답 인터셉터
-apiClient.interceptors.response.use(
+api.interceptors.response.use(
   (response) => {
     return response.data
   },
@@ -70,4 +70,5 @@ apiClient.interceptors.response.use(
     }
     return Promise.reject(error)
   }
+
 )
